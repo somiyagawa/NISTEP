@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIを活用した低資源言語のコーパス構築</title>
+    
+    <!-- Tailwind CSSを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google FontsからInterとNoto Sans JPを読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+
+        /* スライドのトランジション（切り替えアニメーション）設定 */
+        .slide {
+            transition: opacity 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            will-change: opacity;
+        }
+
+        /* 非アクティブなスライドのスタイル（透明にする） */
+        .slide:not(.active) {
+            opacity: 0;
+            pointer-events: none; /* 操作不可にする */
+        }
+        
+        /* アクティブなスライドのスタイル（表示する） */
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* スクロールバーのスタイル */
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .slide::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ダミー画像のスタイル */
+        .dummy-image {
+            background: linear-gradient(135deg, #e2e8f0 25%, #cbd5e1 25%, #cbd5e1 50%, #e2e8f0 50%, #e2e8f0 75%, #cbd5e1 75%, #cbd5e1);
+            background-size: 20px 20px;
+            animation: loading 2s linear infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes loading {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        .dummy-image::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            white-space: pre-line;
+            padding: 1rem;
+        }
+
+        /* アニメーション効果 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* アニメーション要素の初期状態と適用 */
+        [class*="animate-fadeInUp"] {
+            opacity: 0;
+        }
+
+        .slide:not(.active) [class*="animate-fadeInUp"] {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        
+        .slide.active .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .slide.active .animate-fadeInUp-delay-1 {
+            animation: fadeInUp 0.6s ease-out 0.2s forwards;
+        }
+
+        .slide.active .animate-fadeInUp-delay-2 {
+            animation: fadeInUp 0.6s ease-out 0.4s forwards;
+        }
+
+        .slide.active .animate-fadeInUp-delay-3 {
+            animation: fadeInUp 0.6s ease-out 0.6s forwards;
+        }
+        
+        .slide.active .animate-fadeInUp-delay-4 {
+            animation: fadeInUp 0.6s ease-out 0.8s forwards;
+        }
+
+        .hover-pulse:hover {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+    </style>
+</head>
+<body class="bg-slate-100 antialiased overflow-hidden">
+    <!-- プログレスバー -->
+    <div id="progressBar" class="fixed top-0 left-0 h-1 bg-sky-600 z-30 transition-all duration-300 ease-linear"></div>
+
+    <!-- スライドカウンター -->
+    <div id="slideCounter" class="fixed top-5 right-5 z-20 bg-white/80 backdrop-blur-sm shadow-md px-4 py-2 rounded-full text-sm font-medium text-slate-700"></div>
+
+    <!-- プレゼンテーションコンテナ -->
+    <div class="relative w-full h-screen flex items-center justify-center p-4 sm:p-8">
+        <div class="relative w-full max-w-5xl h-full max-h-[680px] rounded-2xl shadow-2xl bg-white overflow-hidden">
+            <!-- スライドがこの中に入ります -->
+            <div id="slideContainer" class="w-full h-full">
+
+                <!-- スライド1：タイトル -->
+                <div class="slide p-8 sm:p-12 md:p-16 flex flex-col justify-center items-center text-center relative">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-sky-100 rounded-full opacity-20 -translate-y-32 translate-x-32 animate-pulse"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-sky-200 rounded-full opacity-20 translate-y-24 -translate-x-24 animate-pulse" style="animation-delay: 1s;"></div>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 leading-tight relative z-10 animate-fadeInUp">AIを活用した低資源言語のコーパス構築と学習支援</h1>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-sky-700 mt-4 relative z-10 animate-fadeInUp-delay-1">古代エジプト語から現代危機言語まで</h2>
+                    <div class="mt-12 text-slate-600 relative z-10 animate-fadeInUp-delay-2">
+                        <p class="text-lg font-semibold">宮川 創</p>
+                        <p class="text-base mt-2">筑波大学 / 国立国語研究所</p>
+                    </div>
+                </div>
+
+                <!-- スライド2：目次 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 mb-8 animate-fadeInUp">本日の内容</h2>
+                    <ol class="space-y-4 text-lg text-slate-700">
+                        <li class="bg-sky-50 p-4 rounded-lg flex items-start hover-pulse animate-fadeInUp-delay-1"><span class="text-sky-600 font-bold mr-3">1.</span> <strong class="mr-1">低資源言語とは？</strong> - デジタル時代の言語格差</li>
+                        <li class="bg-sky-50 p-4 rounded-lg flex items-start hover-pulse animate-fadeInUp-delay-1"><span class="text-sky-600 font-bold mr-3">2.</span> <strong class="mr-1">AIによる解決策</strong> - 技術的アプローチ</li>
+                        <li class="bg-sky-50 p-4 rounded-lg flex items-start hover-pulse animate-fadeInUp-delay-2"><span class="text-sky-600 font-bold mr-3">3.</span> <strong class="mr-1">実例紹介</strong> - 古代エジプト語、沖縄語、アイヌ語</li>
+                        <li class="bg-sky-50 p-4 rounded-lg flex items-start hover-pulse animate-fadeInUp-delay-3"><span class="text-sky-600 font-bold mr-3">4.</span> <strong class="mr-1">最新研究事例</strong> - RAG学習システム THOTH AI</li>
+                        <li class="bg-sky-50 p-4 rounded-lg flex items-start hover-pulse animate-fadeInUp-delay-4"><span class="text-sky-600 font-bold mr-3">5.</span> <strong class="mr-1">結論と展望</strong> - 未来への貢献</li>
+                    </ol>
+                </div>
+
+                <!-- (旧スライド4) スライド3：低資源言語とは？ -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">低資源言語とは？</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">デジタル時代の言語格差</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="animate-fadeInUp-delay-1">
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg">
+                                <h4 class="font-bold text-blue-800 text-lg mb-2">低資源言語の定義</h4>
+                                <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                    <li>話者数やデジタルテキスト資源が極めて少ない言語</li>
+                                    <li>AIや機械翻訳の開発が困難</li>
+                                </ul>
+                            </div>
+                            <div class="mt-4 p-4 rounded-lg">
+                                <h4 class="text-lg font-bold text-slate-800 mb-2">現状の課題</h4>
+                                <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                   <li>限定的なデジタルリソースと専門家不足</li>
+                                   <li>複雑な文字体系と5000年以上にわたる言語変化</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 md:h-80 animate-fadeInUp-delay-2" data-text="言語資源の格差を示すグラフのイメージ"></div>
+                    </div>
+                </div>
+                
+                <!-- (旧スライド10) スライド4：AIによる解決アプローチ -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">AIによる解決アプローチ</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">技術的アプローチ</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <ol class="space-y-3 text-lg text-slate-700">
+                            <li class="p-3 rounded-lg flex items-center hover-pulse animate-fadeInUp-delay-1"><span class="bg-sky-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 shrink-0">1</span> <strong>文献資料のデジタル化 (AI-OCR)</strong></li>
+                            <li class="p-3 rounded-lg flex items-center hover-pulse animate-fadeInUp-delay-1"><span class="bg-sky-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 shrink-0">2</span> <strong>テキスト復元・翻訳 (LLM)</strong></li>
+                            <li class="p-3 rounded-lg flex items-center hover-pulse animate-fadeInUp-delay-2"><span class="bg-sky-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 shrink-0">3</span> <strong>検索拡張生成 (RAG)</strong></li>
+                            <li class="p-3 rounded-lg flex items-center hover-pulse animate-fadeInUp-delay-2"><span class="bg-sky-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 shrink-0">4</span> <strong>テクストリユース探知</strong></li>
+                        </ol>
+                         <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-2" data-text="AI技術の統合によるワークフロー図"></div>
+                    </div>
+                </div>
+
+                <!-- スライド5：実例① TLA -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実例紹介①：古代エジプト語</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">TLA & Coptic SCRIPTORIUM</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4 animate-fadeInUp-delay-1">
+                             <div class="bg-slate-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-bold text-slate-800 mb-2">Thesaurus Linguae Aegyptiae (TLA)</h4>
+                                <ul class="list-disc list-inside space-y-2 text-slate-700 text-sm">
+                                    <li>世界最大の古代エジプト語デジタルコーパス</li>
+                                    <li>各国研究機関の数十年にわたる協力の結晶</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-lg">
+                                <h4 class="text-lg font-bold text-slate-800 mb-2">Coptic SCRIPTORIUM</h4>
+                                <ul class="list-disc list-inside space-y-2 text-slate-700 text-sm">
+                                     <li>コプト語最大のデジタルコーパス</li>
+                                     <li>オープンサイエンスで誰でも利用・貢献可能</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 animate-fadeInUp-delay-2" data-text="TLAとSCRIPTORIUMのロゴまたはUIのイメージ"></div>
+                    </div>
+                </div>
+
+                <!-- 新規追加：TRACERの事例 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">深掘り事例：間テクスト性研究</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">TRACERによるテクストリユース探知</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                         <div class="animate-fadeInUp-delay-1">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">課題</h4>
+                             <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li>古代の文献では引用が明示されないことが多い</li>
+                                <li>語形・語順の変化や言い換えにより、目視での発見は困難</li>
+                            </ul>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-6">
+                                <h4 class="font-bold text-blue-800 text-base mb-2">TRACERの役割</h4>
+                                <p class="text-slate-700 text-sm">コンピュータ支援により、引用・引喩・パラフレーズなどを自動検出し、人文学研究を加速させる。</p>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 animate-fadeInUp-delay-2" data-text="TRACERのロゴと、テクスト間の関連性を示すネットワーク図"></div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">TRACERの研究フロー</h2>
+                    <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-1" data-text="研究ワークフロー図：OCR/手入力 → VMRでデジタル編集版作成(TEI XML) → Coptic NLP Serviceで形態素解析 → TRACERでテクストリユース探知 → TRAVizで可視化・分析"></div>
+                </div>
+                
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">TRACERによる新発見</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">シェヌーテとベーサの書簡分析</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 p-4 rounded-lg animate-fadeInUp-delay-1">
+                             <h4 class="text-lg font-bold text-slate-800 mb-2 text-center">先行研究で見逃された引用</h4>
+                             <table class="w-full text-sm mt-2">
+                                <thead><tr class="border-b"><th class="text-left py-1">対象文献</th><th class="text-right py-1">新規発見数</th></tr></thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="py-1">シェヌーテ『第6カノン』</td><td class="font-mono text-right">14件</td></tr>
+                                    <tr><td class="py-1">ベーサ『書簡と説教集』</td><td class="font-mono text-right">6件</td></tr>
+                                </tbody>
+                             </table>
+                        </div>
+                        <div class="animate-fadeInUp-delay-2">
+                             <h4 class="text-lg font-bold text-slate-800 mb-2">発見のポイント</h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                               <li>引用導入句がない</li>
+                               <li>語彙や語順が変更されている</li>
+                               <li>WordNetによる同義語・類義語の考慮が有効</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- スライド9：実例② 沖縄語 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実例紹介②：沖縄語</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">表記の課題とDOWSプロジェクト</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                         <div class="space-y-4 animate-fadeInUp-delay-1">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">多様な表記法</h4>
+                             <ul class="list-disc list-inside space-y-2">
+                                <li>ひらがな、カタカナ、ローマ字など様々</li>
+                                <li>標準日本語にない音の書き方が辞書等で異なる</li>
+                            </ul>
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mt-6">
+                                <p class="text-red-800 font-semibold">→ DOWSプロジェクトで表記体系を収集・整理</p>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 animate-fadeInUp-delay-2" data-text="沖縄語の多様な表記例のイメージ (豚: ʔワー vs ワ-) "></div>
+                    </div>
+                </div>
+                
+                <!-- スライド10：実例③ アイヌ語 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実例紹介③：アイヌ語</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">危機言語と機械翻訳</h3>
+                     <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="animate-fadeInUp-delay-1">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">言語の特徴と現状</h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                               <li>複統合語という複雑な構造を持つ</li>
+                               <li>UNESCOにより「極めて深刻」な危機にある言語と認定</li>
+                               <li>話者数の減少、方言の消滅が進行</li>
+                            </ul>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 animate-fadeInUp-delay-2" data-text="アイヌ語の複統合を示す例文のイメージ"></div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">アイヌ語の事例：双方向翻訳モデル</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">コーパス構築と学習結果</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-start">
+                        <div class="animate-fadeInUp-delay-1">
+                             <h4 class="text-lg font-bold text-slate-800 mb-2">手法</h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                               <li>デジタル化された多様な文献から約10万文対のコーパスを構築</li>
+                               <li>カタカナ表記をローマ字表記に統一して前処理</li>
+                               <li>Marian MTフレームワークで双方向翻訳モデルを学習</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg animate-fadeInUp-delay-2">
+                             <h4 class="text-lg font-bold text-slate-800 mb-2 text-center">SacreBLEUスコア</h4>
+                             <table class="w-full text-sm mt-2">
+                                <tbody>
+                                    <tr class="border-b"><td class="py-1 pr-2">日本語→アイヌ語</td><td class="font-mono text-right">32.90</td></tr>
+                                    <tr class="border-b"><td class="py-1 pr-2">アイヌ語→日本語</td><td class="font-mono text-right">10.45</td></tr>
+                                    <tr class=""><td class="py-1 pr-2">双方向モデル</td><td class="font-mono text-right">29.91</td></tr>
+                                </tbody>
+                             </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ...ここからRAG研究のセクション... -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">最新研究：RAGによる学習支援</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">THOTH AI プロジェクト</h3>
+                     <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="animate-fadeInUp-delay-1">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">研究目的</h4>
+                            <p class="text-slate-700">検索拡張生成（RAG）技術を活用し、専門知識データベースを参照して古代エジプト語の翻訳や質問応答を行うAI学習支援システム「THOTH AI」を開発・評価する。</p>
+                             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mt-6">
+                                <p class="text-blue-800 font-semibold">どのLLMが古代語タスクに最適か？</p>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-64 animate-fadeInUp-delay-2" data-text="THOTH AI のロゴイメージ"></div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">研究方法：評価モデルと指標</h2>
+                    <div class="grid md:grid-cols-2 gap-6 animate-fadeInUp-delay-1">
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4 text-center">評価対象モデル (7種)</h4>
+                            <ul class="list-decimal list-inside space-y-1 text-sm">
+                                <li class="bg-yellow-200 px-2 rounded">Claude 3.5 Sonnet (Anthropic)</li>
+                                <li>Gemini 2.0 Pro Experimental (Google)</li>
+                                <li>Gemini 2.0 Flash Thinking Exp. (Google)</li>
+                                <li>DeepSeek R1 (DeepSeek)</li>
+                                <li>GPT o1 Pro mode (OpenAI)</li>
+                                <li>GPT 4o (OpenAI)</li>
+                                <li>GPT o3-mini-high (OpenAI)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4 text-center">評価指標 (6種)</h4>
+                             <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li><strong class="font-semibold">BLEU</strong>: n-gramベースの精度評価</li>
+                                <li><strong class="font-semibold">SacreBLEU</strong>: 標準化BLEU</li>
+                                <li><strong class="font-semibold">ROUGE-1</strong>: 1-gram再現率</li>
+                                <li><strong class="font-semibold">ROUGE-L</strong>: 最長共通部分列</li>
+                                <li><strong class="font-semibold">chrF</strong>: 文字レベル評価</li>
+                                <li><strong class="font-semibold">METEOR</strong>: 同義語考慮</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">研究方法：評価データセット</h2>
+                    <div class="bg-slate-50 p-6 rounded-lg animate-fadeInUp-delay-1">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">テストテキスト：トトメス1世の戴冠勅令</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                            <li>年代：紀元前1504-1492年</li>
+                            <li>出典：Sethe, K. (1927) \emph{Urkunden der 18. Dynastie}</li>
+                            <li>内容：王名・称号、行政命令、供犠規定を含む公式文書</li>
+                            <li>評価方式：ゼロショット翻訳タスクとして実施</li>
+                        </ul>
+                    </div>
+                     <div class="dummy-image rounded-lg h-32 mt-6 animate-fadeInUp-delay-2" data-text="評価フロー：ヒエログリフ → LLM → 英語訳"></div>
+                </div>
+                
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実験結果：各モデルの翻訳性能</h2>
+                    <div class="overflow-x-auto animate-fadeInUp-delay-1">
+                        <table class="w-full text-sm text-left mt-4">
+                            <caption class="text-base font-semibold mb-2">各モデルのゼロショット翻訳性能評価結果</caption>
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-4 py-2">モデル</th>
+                                    <th scope="col" class="px-4 py-2">BLEU</th>
+                                    <th scope="col" class="px-4 py-2">SacreBLEU</th>
+                                    <th scope="col" class="px-4 py-2">ROUGE-1</th>
+                                    <th scope="col" class="px-4 py-2">ROUGE-L</th>
+                                    <th scope="col" class="px-4 py-2">chrF</th>
+                                    <th scope="col" class="px-4 py-2">METEOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">Claude 3.5 Sonnet</td><td class="px-4 py-1 bg-green-100">0.325</td><td class="px-4 py-1 bg-green-100">32.46</td><td class="px-4 py-1 bg-green-100">0.717</td><td class="px-4 py-1">0.652</td><td class="px-4 py-1">58.06</td><td class="px-4 py-1 bg-green-100">0.640</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">Gemini 2.0 Pro Exp.</td><td class="px-4 py-1 bg-yellow-100">0.288</td><td class="px-4 py-1 bg-yellow-100">28.77</td><td class="px-4 py-1 bg-yellow-100">0.714</td><td class="px-4 py-1 bg-green-100">0.681</td><td class="px-4 py-1 bg-green-100">59.94</td><td class="px-4 py-1">0.581</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">Gemini 2.0 Flash</td><td class="px-4 py-1">0.256</td><td class="px-4 py-1">25.59</td><td class="px-4 py-1">0.697</td><td class="px-4 py-1 bg-yellow-100">0.664</td><td class="px-4 py-1 bg-yellow-100">59.30</td><td class="px-4 py-1">0.571</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">DeepSeek R1</td><td class="px-4 py-1">0.222</td><td class="px-4 py-1">22.16</td><td class="px-4 py-1">0.675</td><td class="px-4 py-1">0.587</td><td class="px-4 py-1">53.74</td><td class="px-4 py-1">0.510</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">GPT o1 Pro mode</td><td class="px-4 py-1">0.216</td><td class="px-4 py-1">21.60</td><td class="px-4 py-1">0.625</td><td class="px-4 py-1">0.534</td><td class="px-4 py-1">53.17</td><td class="px-4 py-1">0.509</td></tr>
+                                <tr class="bg-white border-b"><td class="px-4 py-1 font-semibold">GPT 4o</td><td class="px-4 py-1">0.196</td><td class="px-4 py-1">19.62</td><td class="px-4 py-1">0.581</td><td class="px-4 py-1">0.484</td><td class="px-4 py-1">51.11</td><td class="px-4 py-1">0.417</td></tr>
+                                <tr class="bg-white"><td class="px-4 py-1 font-semibold">GPT o3-mini-high</td><td class="px-4 py-1">0.034</td><td class="px-4 py-1">3.41</td><td class="px-4 py-1">0.375</td><td class="px-4 py-1">0.233</td><td class="px-4 py-1">35.15</td><td class="px-4 py-1">0.249</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">結果の分析</h2>
+                     <div class="bg-slate-50 p-6 rounded-lg animate-fadeInUp-delay-1">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">主要な知見</h4>
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                           <li><span class="bg-yellow-200 px-1 rounded">Claude 3.5 Sonnet</span>が主要な指標で最高性能を達成。</li>
+                           <li>Gemini 2.0系モデルは文字レベルおよび構造的類似性(chrF, ROUGE-L)で高い性能。</li>
+                           <li>新世代モデルは古代言語タスクに優れた適応性を示す。</li>
+                           <li>GPT o3-mini-highは古代言語タスクには不適。</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">システム構築：THOTH AI</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">Difyプラットフォームと4層アーキテクチャ</h3>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-4 animate-fadeInUp-delay-1">
+                             <div class="bg-blue-100 p-2 rounded-lg text-center font-semibold">フロントエンド層 (Webチャット, OCR)</div>
+                             <div class="text-center">↓</div>
+                             <div class="bg-green-100 p-2 rounded-lg text-center font-semibold">Difyオーケストレーション層 (ワークフロー管理)</div>
+                             <div class="text-center">↓</div>
+                              <div class="bg-yellow-100 p-2 rounded-lg text-center font-semibold">AI処理層 (LLM, Embedding)</div>
+                               <div class="text-center">↓</div>
+                              <div class="bg-red-100 p-2 rounded-lg text-center font-semibold">データ層 (ベクトルDB, 知識ベース)</div>
+                        </div>
+                        <div class="animate-fadeInUp-delay-2">
+                             <h4 class="text-lg font-bold text-slate-800 mb-2">Dify活用の効果</h4>
+                              <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li>専門知識の迅速な統合</li>
+                                <li>柔軟なモデル選択と切り替え</li>
+                                <li>スケーラブルなシステム展開</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">THOTH AIのRAGアーキテクチャ</h2>
+                    <div class="animate-fadeInUp-delay-1">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2 text-center">Hybrid RAG（Basic + Corrective）アプローチ</h4>
+                        <ul class="list-decimal list-inside space-y-2 text-slate-700 bg-slate-50 p-4 rounded-lg">
+                           <li><strong class="font-semibold">前処理：</strong>転写テキストの正規化、トークン化</li>
+                           <li><strong class="font-semibold">マルチソース検索：</strong>辞書・文法規則・用例の並列検索</li>
+                           <li><strong class="font-semibold">コンテキスト構築：</strong>関連性スコアリングと優先順位付け</li>
+                           <li><strong class="font-semibold">生成・検証：</strong>Claude 3.5による翻訳と自己検証</li>
+                           <li><strong class="font-semibold">後処理：</strong>専門用語注釈付与、出力整形</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- ...ここから既存スライドを再開... -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">学際的意義とチーム科学</h2>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-6 animate-fadeInUp-delay-1">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-800 mb-2">分野の融合</h4>
+                                <p>歴史言語学、情報科学、人文学の知見を結集する必要がある。</p>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-800 mb-2">国際協力とDH</h4>
+                                <p>TLAやCoptic SCRIPTORIUMのような大規模プロジェクトは、国際的なチーム科学とデジタル・ヒューマニティーズの推進によって実現される。</p>
+                            </div>
+                        </div>
+                        <div class="dummy-image rounded-lg h-72 animate-fadeInUp-delay-2" data-text="国際的な研究ネットワークの概念図（世界地図と接続線）"></div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">教育と社会への貢献</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">学習ツールから文化遺産の保存まで</h3>
+                    <div class="grid md:grid-cols-2 gap-8 text-slate-700 animate-fadeInUp-delay-2">
+                        <div class="bg-slate-50 p-6 rounded-lg hover-pulse">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4">教育への応用</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>オンラインコーパスを活用した実践的演習</li>
+                                <li>AI翻訳・辞書による学習支援</li>
+                                <li>データ駆動型の新教材開発</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-lg hover-pulse">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4">社会・文化的インパクト</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>デジタル技術による文化遺産の永続的保存</li>
+                                <li>危機言語の復興・継承活動の支援</li>
+                                <li>メディアを通じた言語多様性の啓発</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">結論と今後の展望</h2>
+                    <div class="grid md:grid-cols-2 gap-8 mt-8">
+                        <div class="animate-fadeInUp-delay-1">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">主要な研究成果</h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li><strong class="font-semibold">モデル性能評価</strong>：Claude 3.5 Sonnet・Gemini 2.0系の優位性実証</li>
+                                <li><strong class="font-semibold">RAG技術の有効性</strong>：専門知識補完効果を定量的に確認</li>
+                                <li><strong class="font-semibold">統合システムの実現</strong>：古代語から現代危機言語までを対象</li>
+                            </ul>
+                        </div>
+                        <div class="animate-fadeInUp-delay-2">
+                            <h4 class="text-lg font-bold text-slate-800 mb-2">今後の研究課題</h4>
+                            <ul class="list-disc list-inside space-y-2 text-slate-700">
+                                <li>ヒエラティック・デモティック文字のOCR機能開発</li>
+                                <li>マルチモーダルRAGによる図像資料との統合分析</li>
+                                <li>他の古代・危機言語への技術展開</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide p-8 sm:p-12 md:p-16 flex flex-col justify-center items-center text-center relative">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-sky-100 rounded-full opacity-20 -translate-y-32 translate-x-32 animate-pulse"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-sky-200 rounded-full opacity-20 translate-y-24 -translate-x-24 animate-pulse" style="animation-delay: 1s;"></div>
+                    <h2 class="text-3xl font-bold text-slate-800 relative z-10 animate-fadeInUp">ご清聴ありがとうございました</h2>
+                    <p class="text-xl text-slate-600 mt-8 relative z-10 animate-fadeInUp-delay-1">
+                        お問い合わせ：<a href="mailto:miyagawa.so.kb@u.tsukuba.ac.jp" class="text-sky-600 hover:underline">miyagawa.so.kb@u.tsukuba.ac.jp</a><br>
+                        THOTH AI：<a href="https://somiyagawa.com/thoth" target="_blank" class="text-sky-600 hover:underline">https://somiyagawa.com/thoth</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="fixed bottom-5 right-5 z-20 flex items-center gap-4">
+        <button id="prevBtn" class="w-12 h-12 rounded-full bg-white/70 backdrop-blur-sm shadow-lg flex items-center justify-center text-slate-600 hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" title="前のスライド (←)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button id="nextBtn" class="w-12 h-12 rounded-full bg-white/70 backdrop-blur-sm shadow-lg flex items-center justify-center text-slate-600 hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" title="次のスライド (→)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+    </div>
+
+    <!-- キーボードヒント -->
+    <div class="fixed bottom-5 left-5 z-20 text-xs text-slate-500 bg-white/70 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm">
+        <span class="font-medium">キーボード操作:</span> ← → でスライド切替
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slideContainer = document.getElementById('slideContainer');
+            const slides = Array.from(slideContainer.children);
+            const totalSlides = slides.length;
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slideCounter');
+            const progressBar = document.getElementById('progressBar');
+            
+            let currentSlide = 0;
+            let isAnimating = false;
+
+            function updateSlides(direction) {
+                if (isAnimating) return;
+                
+                const newSlideIndex = currentSlide + direction;
+                if (newSlideIndex < 0 || newSlideIndex >= totalSlides) return;
+
+                isAnimating = true;
+
+                slides[currentSlide].classList.remove('active');
+                slides[newSlideIndex].classList.add('active');
+                
+                setTimeout(() => { isAnimating = false; }, 500);
+
+                currentSlide = newSlideIndex;
+                updateUI();
+            }
+
+            function updateUI() {
+                if (totalSlides === 0) return;
+                slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                const progress = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = `${progress}%`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+            }
+
+            prevBtn.addEventListener('click', () => updateSlides(-1));
+            nextBtn.addEventListener('click', () => updateSlides(1));
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') updateSlides(-1);
+                if (e.key === 'ArrowRight') updateSlides(1);
+            });
+
+            let touchStartX = 0;
+            slideContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            slideContainer.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const swipeThreshold = 50;
+                if (touchStartX - touchEndX > swipeThreshold) updateSlides(1);
+                else if (touchEndX - touchStartX > swipeThreshold) updateSlides(-1);
+            });
+            
+            function initialize() {
+                if (slides.length > 0) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    slides[0].classList.add('active');
+                }
+                updateUI();
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
