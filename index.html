@@ -380,13 +380,13 @@
                                      <li>ヒエラティック最大の字形データベース</li>
                                  </ul>
                                  <!-- 修正：リンク切れの画像をプレースホルダーに置き換え -->
-                                 <img src="https://placehold.co/400x200/f1f5f9/475569?text=AKU-PALのスクリーンショット" alt="AKU-PALのスクリーンショット" class="rounded-lg shadow-md my-4">
+                                 <img src="https://www.dhii.jp/DHM/imgs/145/Miyagawa_image1.png" alt="AKU-PALのスクリーンショット" class="rounded-lg shadow-md my-4">
                                  <p class="text-xs text-slate-500">Miyagawa 2025 (The Digital Orientalist) より</p>
                              </div>
                              <div class="bg-slate-50 p-4 rounded-lg">
                                  <h4 class="text-lg font-bold text-slate-800 mb-2">DPDP</h4>
                                  <!-- 修正：リンク切れの画像をプレースホルダーに置き換え -->
-                                 <img src="https://placehold.co/400x200/f1f5f9/475569?text=DPDPのスクリーンショット" alt="DPDPのスクリーンショット" class="rounded-lg shadow-md mb-4">
+                                 <img src="https://digitalorientalist.wordpress.com/wp-content/uploads/2025/05/screenshot-2025-05-31-at-15.45.08.png" alt="DPDPのスクリーンショット" class="rounded-lg shadow-md mb-4">
                                  <ul class="list-disc list-inside space-y-2 text-slate-700 text-sm">
                                      <li>デモティック最大の字形データベース &amp; コーパス &amp; 辞典</li>
                                      <li>まだ部分的にしか公開されていないため、完全公開が待たれる</li>
@@ -421,17 +421,87 @@
                 <!-- スライド13：TRACERの研究フロー -->
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
                     <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">TRACERの研究フロー</h2>
-                    <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-1 flex flex-col justify-center items-center" data-text="研究ワークフロー図：
-                    OCR/手入力 
-                    ↓
-                    VMRでデジタル編集版作成(TEI XML) 
-                    ↓
-                    Coptic NLP Serviceで形態素解析 
-                    ↓
-                    TRACERでテクストリユース探知
-                    ↓
-                    TRAVizで可視化・分析">
-                    </div>
+         はい、承知いたしました。ご指定の研究ワークフロー図を、HTMLに直接埋め込めるSVG形式で作成します。以下がそのコードです。
+
+このSVGは、背景が透明で、各ステップが角丸の長方形で表現され、矢印で繋がれています。テキストは中央に配置されています。HTMLファイルにこのコードをコピー＆ペーストするだけで表示できます。
+
+HTML
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>研究ワークフロー図</title>
+</head>
+<body>
+
+<h1>研究ワークフロー図</h1>
+
+<svg width="100%" viewBox="0 0 400 520" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="14">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <style>
+      .box {
+        fill: #f9f9f9;
+        stroke: #ccc;
+        stroke-width: 1.5;
+        rx: 8; /* 角の丸み */
+        ry: 8;
+      }
+      .flow-line {
+        stroke: #333;
+        stroke-width: 2;
+        marker-end: url(#arrowhead);
+      }
+      .text-content {
+        text-anchor: middle;
+        fill: #333;
+        font-size: 16px;
+      }
+    </style>
+  </defs>
+
+  <text x="200" y="30" font-size="20" font-weight="bold" text-anchor="middle">研究ワークフロー図</text>
+
+  <g transform="translate(0, 70)">
+    <rect x="50" y="0" width="300" height="60" class="box" />
+    <text x="200" y="35" class="text-content">OCR/手入力</text>
+  </g>
+
+  <line x1="200" y1="130" x2="200" y2="155" class="flow-line" />
+
+  <g transform="translate(0, 160)">
+    <rect x="50" y="0" width="300" height="60" class="box" />
+    <text x="200" y="28" class="text-content">VMRでデジタル編集版作成</text>
+    <text x="200" y="48" class="text-content">(TEI XML)</text>
+  </g>
+
+  <line x1="200" y1="220" x2="200" y2="245" class="flow-line" />
+
+  <g transform="translate(0, 250)">
+    <rect x="50" y="0" width="300" height="60" class="box" />
+    <text x="200" y="35" class="text-content">Coptic NLP Serviceで形態素解析</text>
+  </g>
+
+  <line x1="200" y1="310" x2="200" y2="335" class="flow-line" />
+
+  <g transform="translate(0, 340)">
+    <rect x="50" y="0" width="300" height="60" class="box" />
+    <text x="200" y="35" class="text-content">TRACERでテクストリユース探知</text>
+  </g>
+
+  <line x1="200" y1="400" x2="200" y2="425" class="flow-line" />
+
+  <g transform="translate(0, 430)">
+    <rect x="50" y="0" width="300" height="60" class="box" />
+    <text x="200" y="35" class="text-content">TRAVizで可視化・分析</text>
+  </g>
+
+</svg>
+
                      <p class="text-slate-700 text-sm mt-4 text-center">
                         Coptic WordNetで同義語・類義語を考慮し、より精度の高いテクストリユース探知を実現。
                     </p>
@@ -556,19 +626,7 @@
                     </div>
                 </div>
                 
-                <!-- スライド23：結果の分析 -->
-                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
-                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">結果の分析</h2>
-                     <div class="bg-slate-50 p-6 rounded-lg animate-fadeInUp-delay-1">
-                        <h4 class="text-lg font-bold text-slate-800 mb-2">主要な知見</h4>
-                        <ul class="list-disc list-inside space-y-2 text-slate-700">
-                            <li><span class="bg-yellow-200 px-1 rounded">Claude 3.5 Sonnet</span>が主要な指標で最高性能を達成。</li>
-                            <li>Gemini 2.0系モデルは文字レベルおよび構造的類似性(chrF, ROUGE-L)で高い性能。</li>
-                            <li>新世代モデルは古代言語タスクに優れた適応性を示す。</li>
-                            <li>GPT o3-mini-highは古代言語タスクには不適。</li>
-                        </ul>
-                    </div>
-                </div>
+
                 
                 <!-- スライド24：システム構築 -->
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
