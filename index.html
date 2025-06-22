@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIを活用した低資源言語のコーパス構築</title>
+    <title>AIを活用した低資源言語のコーパス構築：古代エジプト語・コプト語を中心に</title>
     
     <!-- Tailwind CSSを読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -149,11 +149,11 @@
                 <div class="slide p-8 sm:p-12 md:p-16 flex flex-col justify-center items-center text-center relative">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-sky-100 rounded-full opacity-20 -translate-y-32 translate-x-32 animate-pulse"></div>
                     <div class="absolute bottom-0 left-0 w-48 h-48 bg-sky-200 rounded-full opacity-20 translate-y-24 -translate-x-24 animate-pulse" style="animation-delay: 1s;"></div>
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 leading-tight relative z-10 animate-fadeInUp">AIを活用した低資源言語のコーパス構築と学習支援</h1>
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-sky-700 mt-4 relative z-10 animate-fadeInUp-delay-1">古代エジプト語から現代危機言語まで</h2>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 leading-tight relative z-10 animate-fadeInUp">AIを活用した低資源言語のコーパス構築</h1>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold text-sky-700 mt-4 relative z-10 animate-fadeInUp-delay-1">古代エジプト語・コプト語を中心に</h2>
                     <div class="mt-12 text-slate-600 relative z-10 animate-fadeInUp-delay-2">
                         <p class="text-lg font-semibold">宮川 創</p>
-                        <p class="text-base mt-2">筑波大学 / 国立国語研究所</p>
+                        <p class="text-base mt-2">筑波大学 人文社会系/西アジア文明研究センター</p>
                     </div>
                 </div>
 
@@ -179,14 +179,14 @@
                                 <h4 class="font-bold text-blue-800 text-lg mb-2">低資源言語の定義</h4>
                                 <ul class="list-disc list-inside space-y-2 text-slate-700">
                                     <li>話者数やデジタルテキスト資源が極めて少ない言語</li>
-                                    <li>AIや機械翻訳の開発が困難</li>
+                                    <li>言語モデルに学習させるテキストが少ないため、AIや大規模言語モデルの開発が困難</li>
                                 </ul>
                             </div>
                             <div class="mt-4 p-4 rounded-lg">
                                 <h4 class="text-lg font-bold text-slate-800 mb-2">現状の課題</h4>
                                 <ul class="list-disc list-inside space-y-2 text-slate-700">
-                                   <li>限定的なデジタルリソースと専門家不足</li>
-                                   <li>複雑な文字体系と5000年以上にわたる言語変化</li>
+                                   <li>限定的なデジタルコーパスと専門家不足</li>
+                                   <li>（複雑な文字体系を持つ文献言語に限ると）文字体系のコンピュータでの処理が不十分</li>
                                 </ul>
                             </div>
                         </div>
@@ -206,6 +206,10 @@
                             <li class="p-3 rounded-lg flex items-center hover-pulse animate-fadeInUp-delay-2"><span class="bg-sky-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 shrink-0">4</span> <strong>テクストリユース探知</strong></li>
                         </ol>
                          <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-2" data-text="AI技術の統合によるワークフロー図"></div>
+                         <h4>AI開発とコーパス構築の好循環</h4>
+                         <p>コーパスが増える→言語モデルの学習量が増える→コーパス構築が容易になる→コーパスが増える</p>
+                         <p>これには専門家による精密なデータの修正・検証が必須!</p><!--
+                         <p></ データが必要なことを強調する-->
                     </div>
                 </div>
 
@@ -224,10 +228,10 @@
                         <div>
                             <h4 class="text-lg font-bold text-slate-800 mb-2">文字体系</h4>
                             <ul class="list-disc list-inside space-y-2 text-slate-700">
-                                <li><strong class="font-semibold">ヒエログリフ</strong>：聖刻文字（石碑・神殿）</li>
-                                <li><strong class="font-semibold">ヒエラティック</strong>：神官文字（パピルス）</li>
-                                <li><strong class="font-semibold">デモティック</strong>：民衆文字（実務文書）</li>
-                                                                <li><strong class="font-semibold">コプト文字</strong>：ギリシア文字＋いくつかの民衆文字</li>
+                                <li><strong class="font-semibold">ヒエログリフ</strong>：聖刻文字（石碑・神殿・パピルス）</li>
+                                <li><strong class="font-semibold">ヒエラティック</strong>：神官文字（パピルス・オストラカなど）</li>
+                                <li><strong class="font-semibold">デモティック</strong>：民衆文字（パピルス・オストラカ・碑文など）</li>
+                                <li><strong class="font-semibold">コプト文字</strong>：ギリシア文字＋いくつかの民衆文字</li>
 
                             </ul>
                         </div>
@@ -246,6 +250,7 @@
                                 <li>紀元2-3世紀頃に文字体系が成立</li>
                                 <li>ギリシャ文字24字＋デモティック由来6-9字</li>
                                 <li>キリスト教（コプト正教会）の典礼言語</li>
+                                <li>初期キリスト教、初期修道制、マニ教などの貴重な資料が多数</li>
                                 <li>日常語としての最後の記録は17世紀ころだが、19世紀から言語復興運動が続いている</li>
                             </ul>
                         </div>
@@ -416,7 +421,12 @@
 
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
                     <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">TRACERの研究フロー</h2>
-                    <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-1" data-text="研究ワークフロー図：OCR/手入力 → VMRでデジタル編集版作成(TEI XML) → Coptic NLP Serviceで形態素解析 → TRACERでテクストリユース探知 → TRAVizで可視化・分析"></div>
+                    <div class="dummy-image rounded-lg h-80 animate-fadeInUp-delay-1" data-text="研究ワークフロー図：OCR/手入力 → VMRでデジタル編集版作成(TEI XML) → Coptic NLP Serviceで形態素解析 → TRACERでテクストリユース探知 → TRAVizで可視化・分析">
+
+                        <p class="text-slate-700 text-sm mt-4">
+                            Coptic WordNetで同義語・類義語を考慮し、より精度の高いテクストリユース探知を実現。
+                        </p>
+                    </div>
                 </div>
                 
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
@@ -444,10 +454,79 @@
                     </div>
                 </div>
                 
+                
+                <!-- スライド25：消滅危機言語の現状 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">消滅危機言語の現状</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-6 animate-fadeInUp-delay-1">世界と日本の言語多様性の危機</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4 animate-fadeInUp-delay-1">
+                                <h4 class="font-bold text-red-800 text-base mb-2">消滅とは</h4>
+                                <p class="text-sm text-slate-700">母語話者・学習者がいなくなること</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 p-4 rounded-lg mb-4 animate-fadeInUp-delay-1">
+                                <h4 class="text-base font-bold text-slate-800 mb-2">日本の消滅危機言語（UNESCO認定）</h4>
+                                <div class="text-sm text-slate-700">
+                                    <p class="font-semibold text-red-700 mb-1">【極めて深刻】</p>
+                                    <p class="pl-3 mb-2">アイヌ語</p>
+                                    <p class="font-semibold text-orange-600 mb-1">【重大な危機】</p>
+                                    <p class="pl-3 mb-2">八重山語、与那国語</p>
+                                    <p class="font-semibold text-amber-600 mb-1">【危険】</p>
+                                    <p class="pl-3">八丈語、奄美語、国頭語、沖縄語、宮古語</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-slate-50 p-4 rounded-lg animate-fadeInUp-delay-2">
+                                <h4 class="text-base font-bold text-slate-800 mb-3">世界の言語状況（約7,000言語中）</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="bg-gray-100 p-2 rounded">
+                                        <p class="font-semibold text-gray-700">🚫 完全消滅</p>
+                                        <p class="text-xs text-slate-600 pl-4">タスマニア諸語、エフタル語、ピクト語等</p>
+                                    </div>
+                                    <div class="bg-amber-50 p-2 rounded">
+                                        <p class="font-semibold text-amber-700">📚 学習言語として存続</p>
+                                        <p class="text-xs text-slate-600 pl-4">ラテン語、シュメール語、アッカド語等</p>
+                                    </div>
+                                    <div class="bg-green-50 p-2 rounded">
+                                        <p class="font-semibold text-green-700">🔄 復興成功</p>
+                                        <p class="text-xs text-slate-600 pl-4">ヘブライ語、コーンウォール語、コプト語等</p>
+                                    </div>
+                                    <div class="bg-blue-50 p-2 rounded">
+                                        <p class="font-semibold text-blue-700">📈 回復中</p>
+                                        <p class="text-xs text-slate-600 pl-4">ハワイ語、マオリ語等</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-sky-50 border-l-4 border-sky-500 p-4 rounded-r-lg mt-6 animate-fadeInUp-delay-2">
+                        <h4 class="font-bold text-sky-800 text-sm mb-2">なぜ「沖縄語」「宮古語」と呼ぶのか？</h4>
+                        <div class="grid md:grid-cols-2 gap-4 text-xs text-slate-700">
+                            <div>
+                                <p class="font-semibold mb-1">ロマンス語族の例：</p>
+                                <p>「月」スペイン語 luna / イタリア語 luna / フランス語 lune</p>
+                                <p class="text-gray-600">→同じ祖語でも別言語</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold mb-1">日琉語族の例：</p>
+                                <p>「月」日本語 tsuki / 沖縄語 chichi / 宮古語 ksks</p>
+                                <p class="text-gray-600">→同じ祖語でも別言語</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-xl text-red-600 font-bold mt-6 animate-pulse">約2,500言語が消滅の危機</p>
+                </div>
                 <!-- スライド9：実例② 沖縄語 -->
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
-                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実例紹介②：沖縄語</h2>
-                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">表記の課題とDOWSプロジェクト</h3>
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">そのほかの低資源言語への応用①：沖縄語</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">表記の課題とOMOLOとDOWSプロジェクト</h3>
                     <div class="grid md:grid-cols-2 gap-6 items-center">
                          <div class="space-y-4 animate-fadeInUp-delay-1">
                             <h4 class="text-lg font-bold text-slate-800 mb-2">多様な表記法</h4>
@@ -465,7 +544,7 @@
                 
                 <!-- スライド10：実例③ アイヌ語 -->
                 <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
-                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">実例紹介③：アイヌ語</h2>
+                    <h2 class="text-3xl font-bold text-center text-slate-800 animate-fadeInUp">そのほかの低資源言語への応用②：アイヌ語</h2>
                     <h3 class="text-xl font-semibold text-center text-sky-700 mb-8 animate-fadeInUp-delay-1">危機言語と機械翻訳</h3>
                      <div class="grid md:grid-cols-2 gap-6 items-center">
                         <div class="animate-fadeInUp-delay-1">
@@ -707,6 +786,28 @@
                     </div>
                 </div>
 
+                   <!-- スライド29：長期的展望 -->
+                <div class="slide p-8 sm:p-12 md:p-16 overflow-y-auto">
+                    <h2 class="text-3xl font-bold text-center text-slate-800">長期的展望</h2>
+                    <h3 class="text-xl font-semibold text-center text-sky-700 mb-8">100年スパンの挑戦</h3>
+                     <div class="grid md:grid-cols-2 gap-8 text-slate-700">
+                        <div class="bg-slate-50 p-6 rounded-lg">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4">デジタル技術とAIの貢献</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>保存の速度と規模を飛躍的向上</li>
+                                <li>未来の研究者への貴重な贈り物</li>
+                                <li>新たな視点からの解析・利用</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-lg">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4">意義</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>過去の記録保存</li>
+                                <li>未来への道を拓く</li>
+                            </ul>
+                        </div>
+                    </div>
+
                 <div class="slide p-8 sm:p-12 md:p-16 flex flex-col justify-center items-center text-center relative">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-sky-100 rounded-full opacity-20 -translate-y-32 translate-x-32 animate-pulse"></div>
                     <div class="absolute bottom-0 left-0 w-48 h-48 bg-sky-200 rounded-full opacity-20 translate-y-24 -translate-x-24 animate-pulse" style="animation-delay: 1s;"></div>
@@ -719,6 +820,7 @@
             </div>
         </div>
     </div>
+    
 
     <!-- ナビゲーション -->
     <div class="fixed bottom-5 right-5 z-20 flex items-center gap-4">
